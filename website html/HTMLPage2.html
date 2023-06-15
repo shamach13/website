@@ -1,0 +1,197 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+            .button:hover {
+                background-color: #45a049;
+            }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Contact Form</h1>
+        <form id="contactForm">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+                <div id="nameError" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <div id="emailError" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" name="phone" required>
+                <div id="phoneError" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label for="message">How Can We Help? (Description):</label>
+                <textarea id="message" name="message" required></textarea>
+                <div id="messageError" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label for="services">Services:</label>
+                <input type="text" id="services" name="services" required>
+                <div id="servicesError" class="error"></div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Send Message" class="button">
+            </div>
+        </form>
+    </div>
+
+    <script>
+    const form = document.getElementById('contactForm');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (validateForm()) {
+                const formData = new FormData(form);
+
+                try {
+                    const response = await fetch('https://api.example.com/submit', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        console.log('Form submitted successfully');
+                        // Reset form fields and errors
+                        form.reset();
+                        resetErrors();
+                        // You can perform any desired actions here, such as displaying a success message or redirecting the user
+                    } else {
+                        console.log('Form submission failed');
+                        // You can handle the error condition here, such as displaying an error message to the user
+                    }
+                } catch (error) {
+                    console.error('Error submitting the form:', error);
+                    // You can handle the error condition here, such as displaying an error message to the user
+                }
+            }
+        });
+
+        function validateForm() {
+            let isValid = true;
+
+            const name = document.getElementById('name');
+            const email = document.getElementById('email');
+            const phone = document.getElementById('phone');
+            const message = document.getElementById('message');
+            const services = document.getElementById('services');
+
+            const nameError = document.getElementById('nameError');
+            const emailError = document.getElementById('emailError');
+            const phoneError = document.getElementById('phoneError');
+            const messageError = document.getElementById('messageError');
+            const servicesError = document.getElementById('servicesError');
+
+            resetErrors();
+
+            if (name.value.trim() === '') {
+                nameError.textContent = 'Name is required';
+                isValid = false;
+            }
+
+            if (email.value.trim() === '') {
+                emailError.textContent = 'Email is required';
+                isValid = false;
+            } else if (!isValidEmail(email.value.trim())) {
+                emailError.textContent = 'Invalid email format';
+                isValid = false;
+            }
+
+            if (phone.value.trim() === '') {
+                phoneError.textContent = 'Phone number is required';
+                isValid = false;
+            } else if (!isValidPhone(phone.value.trim())) {
+                phoneError.textContent = 'Invalid phone number format';
+                isValid = false;
+            }
+
+            if (message.value.trim() === '') {
+                messageError.textContent = 'Message is required';
+                isValid = false;
+            }
+
+            if (services.value.trim() === '') {
+                servicesError.textContent = 'Services field is required';
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        function isValidEmail(email) {
+            const emailPattern = /^\S+@\S+\.\S+$/;
+            return emailPattern.test(email);
+        }
+
+        function isValidPhone(phone) {
+            const phonePattern = /^\d{10}$/;
+            return phonePattern.test(phone);
+        }
+
+        function resetErrors() {
+            const errorElements = document.getElementsByClassName('error');
+            for (let i = 0; i < errorElements.length; i++) {
+                errorElements[i].textContent = '';
+            }
+        }
